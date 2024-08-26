@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PastVoyageMapping</title>
+
+        <img src="logo.png" alt="PastVoyageMapping logo"> <!-- El otro GIF permanece sin cambios -->
+
+    <style>
+        .aviso {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000; /* Asegura que esté por encima del mapa */
+        }
+
+        .mapa-container {
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mapa {
+            display: block;
+            height: auto;
+            width: auto;
+            max-width: 100%; /* Ajusta según el tamaño máximo que desees */
+            max-height: 100%; /* Ajusta según el tamaño máximo que desees */
+            cursor: grab;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #restablecer-zoom {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001; /* Asegura que esté por encima del mapa y del aviso */
+            display: none; /* Ocultar inicialmente el botón */
+        }
+    </style>
+</head>
+<body>
+    <div id="mapa-container" class="mapa-container" onwheel="zoom(event)" onmousedown="startDragging(event)" onmouseup="stopDragging()">
+        <img id="mapa" class="mapa" src="mapa.png" alt="Mapa histórico">
+    </div>
+    <div id="aviso" class="aviso">
+        <p>Este sitio contiene varios lugares, incluidos los históricos. Algunos contenidos pueden ser sensibles. ¿Deseas continuar?</p>
+        <button onclick="aceptarAviso()">Aceptar</button>
+    </div>
+    <button id="restablecer-zoom" onclick="restablecerZoom()">Restablecer Zoom</button>
+
+    <script>
+        var factorZoom = 1; // Factor de zoom inicial
+        var lastX, lastY;
+        var dragging = false;
+
+        // Función para mostrar el aviso
+        function aceptarAviso() {
+            document.getElementById("aviso").style.display = "none";
+        }
+
+        // Función para hacer zoom
+        function zoom(event) {
+            event.preventDefault(); // Evitar el comportamiento predeterminado del scroll
+
+            var mapa = document.getElementById("mapa");
+            var delta = Math.max(-1, Math.min(1, (event.deltaY || -event.detail))); // Detectar dirección del scroll
+            var scale = 1 + delta * 0.4; // Ajustar el factor de zoom (cambia 0.4 según necesites para un mayor zoom)
+
+            factorZoom *= scale;
+
+            // Limitar el zoom dentro de los límites del mapa
+            factorZoom = Math.max(1.5, Math.min(factorZoom, 5)); // Ajustar límites de zoom
+
+            mapa.style.transform = "scale(" + factorZoom + ")";
+
+            // Mostrar el botón para restablecer el zoom
+            document.getElementById("restablecer-zoom").style.display = "block";
+        }
+
+        // Función para restablecer el zoom
+        function restablecerZoom() {
+            var mapa = document.getElementById("mapa");
+            factorZoom = 1; // Restablecer el factor de zoom por defecto
+            mapa.style.transform = "scale(" + factorZoom + ")";
+            // Ocultar el botón para restablecer el zoom
+            document.getElementById("restablecer-zoom").style.display = "none";
+        }
+
+        // Funciones para arrastrar el mapa
+        function startDragging(event) {
+            dragging = true;
+            lastX = event.clientX;
+            lastY = event.clientY;
+            event.preventDefault();
+        }
+
+        function stopDragging() {
+            dragging = false;
+        }
+
+        document.addEventListener('mousemove', function(event) {
+            if (dragging) {
+                var mapa = document.getElementById("mapa");
+                var newX = lastX - event.clientX;
+                var newY = lastY - event.clientY;
+
+                mapa.style.left = mapa.offsetLeft - newX + 'px';
+                mapa.style.top = mapa.offsetTop - newY + 'px';
+
+                lastX = event.clientX;
+                lastY = event.clientY;
+            }
+        });
+</script>
+
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barra de Búsqueda</title>
+</head>
+<body>
+
+<form id="search-form">
+    <input type="search" id="search-input" name="q" placeholder="Cambiar año o buscar info..." autofocus>
+    <button type="submit">Agregar o Buscar</button>
+</form>
+
+<script>
+    document.getElementById("search-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Evitar que el formulario se envíe de forma predeterminada
+        
+        var query = document.getElementById("search-input").value.trim().toLowerCase(); // Obtener el valor de búsqueda, eliminar espacios en blanco y convertir a minúsculas
+        if (query !== "") {
+            search(query); // Llamar a la función de búsqueda si la consulta no está vacía
+        } else {
+            alert("Por favor, ingresa un término de búsqueda válido.");
+        }
+    });
+    
+    function search(query) {
+        // Definir las páginas web que quieres abrir según la búsqueda
+        switch(query) {
+            case "mexico":
+                window.location.href = "datos-mexico.html"; // Redirigir a la página mas_comics.html si la búsqueda coincide
+                break;
+            case "plaza de guadalajara":
+                window.location.href = "Plazadeguadalajara.html"; // Redirigir a la página otros_comics_xd.html si la búsqueda coincide
+                break;
+            case "peru":
+                window.location.href = "datos-peru.html"; // Redirigir a la página rusiaenguerraconucrania.html si la búsqueda coincide
+                break;
+            case "torre eiffel":
+                window.location.href = "Torreifel.html"; // Redirigir a la página rusiaenguerraconucrania.html si la búsqueda coincide
+                break;
+            case "serra de casamanya":
+                window.location.href = "Sdecasamanya.html"; // Redirigir a la página rusiaenguerraconucrania.html si la búsqueda coincide
+                break;
+            case "estructura en seul 0":
+                window.location.href = "edifrandom0.html"; // Redirigir a la página rusiaenguerraconucrania.html si la búsqueda coincide
+                break;
+            default:
+                alert("No se encontraron resultados para: " + query); // Mostrar un mensaje de alerta si no se encuentra ninguna coincidencia
+        }
+    }
+</script>
+
+</body>
+</html>
+
+
+
+<h1> Año 2024 </h1>
+
+<h2> Copyright 2024. Derechos reservados. Recuerda que este sitio esta en pruebas por lo que puede haber errores, además para buscar un sitio o un Pais no se necesitan tildes o acentos ortográficos.</h2>
